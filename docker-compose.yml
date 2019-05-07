@@ -1,0 +1,41 @@
+version: "3.7"
+services:
+
+  web:
+    build:
+      context: ./docker/dockerfiles
+      dockerfile: Dockerfile-nginx
+    restart: always
+    ports:
+     - ${APP_HTTP_PORT:-80}:80
+     - ${APP_HTTPS_PORT:-443}:443
+    environment:
+      - TZ=${APP_TIMEZONE:-UTC}
+    volumes:
+      - ./:/damafactory/app
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/nginx/default-server.conf:/etc/nginx/conf.d/default-server.conf
+    networks:
+      - damafactory
+
+  php:
+    build:
+      context: ./docker/dockerfiles
+      dockerfile: Dockerfile-php
+    restart: always
+    environment:
+      - TZ=${APP_TIMEZONE:-UTC}
+    volumes:
+      - ./:/damafactory/app
+      - ./config/php/php.ini:/usr/local/etc/php/conf.d/default-server.ini
+    networks:
+      - damafactory
+
+networks:
+  damafactory:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+     config:
+      - subnet: ${DOCKER_SUBNET:-10.5.0.0/24}
