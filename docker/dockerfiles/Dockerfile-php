@@ -97,28 +97,24 @@ RUN docker-php-ext-install -j$(nproc) bcmath && \
   docker-php-ext-install -j$(nproc) zip && \
   \
   printf "\n" | pecl install redis && \
-  pecl install imagick-beta && \
-  pecl install mongodb && \
   pecl install memcached && pecl install && \
   pecl install xdebug && \
   \
-  docker-php-ext-enable redis imagick mongodb memcached xdebug
+  docker-php-ext-enable redis memcached xdebug
 
 
-# Add user damabox
-RUN adduser --disabled-password --gecos "" damabox && adduser damabox sudo && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+# Add user damafactory
+RUN adduser --disabled-password --gecos "" damafactory && adduser damafactory sudo && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-RUN mkdir -p /app
-RUN chown -R damabox:damabox /app
+RUN mkdir -p /damafactory/app
+RUN chown -R damafactory:damafactory /damafactory/app
 
-USER damabox
+USER damafactory
 
 RUN /bin/bash -l -c 'cd $HOME && curl -L https://git.io/n-install | bash -s -- -y'
 
-# Install Laravel installer
-#RUN composer global require "laravel/installer"
 ENV PATH="/root/.composer/vendor/bin:${PATH}"
-ENV PATH="/home/damabox/.composer/vendor/bin:${PATH}"
+ENV PATH="/home/damafactory/.composer/vendor/bin:${PATH}"
 
 # Install phpunit
 RUN sudo wget https://phar.phpunit.de/phpunit.phar -O phpunit.phar
@@ -134,4 +130,4 @@ RUN echo 'export PS1="\n\[$STARTCOLOR\]\u@\h:\! <\t> \w\n\$ \[$ENDCOLOR\]"' >> $
 # Clean up system
 RUN sudo apt-get -y autoclean && sudo apt-get -y autoremove && sudo apt-get -y clean && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-WORKDIR /app
+WORKDIR /damafactory/app
