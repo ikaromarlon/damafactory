@@ -67,7 +67,6 @@ RUN docker-php-ext-install -j$(nproc) bcmath && \
   docker-php-ext-install -j$(nproc) dom && \
   docker-php-ext-install -j$(nproc) exif && \
   docker-php-ext-install -j$(nproc) fileinfo && \
-  docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
   docker-php-ext-install -j$(nproc) gd && \
   docker-php-ext-install -j$(nproc) gettext && \
   docker-php-ext-install -j$(nproc) hash && \
@@ -102,7 +101,6 @@ RUN docker-php-ext-install -j$(nproc) bcmath && \
   \
   docker-php-ext-enable redis memcached xdebug
 
-
 # Add user damafactory
 RUN adduser --disabled-password --gecos "" damafactory && adduser damafactory sudo && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
@@ -110,8 +108,6 @@ RUN mkdir -p /damafactory/app
 RUN chown -R damafactory:damafactory /damafactory/app
 
 USER damafactory
-
-RUN /bin/bash -l -c 'cd $HOME && curl -L https://git.io/n-install | bash -s -- -y'
 
 ENV PATH="/root/.composer/vendor/bin:${PATH}"
 ENV PATH="/home/damafactory/.composer/vendor/bin:${PATH}"

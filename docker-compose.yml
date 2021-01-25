@@ -1,40 +1,46 @@
 version: "3.7"
+
+networks:
+
+  damafactory:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      config:
+        - subnet: ${DOCKER_SUBNET:-10.5.0.0/24}
+
 services:
 
-  web:
+  nginx:
     build:
       context: ./docker/dockerfiles
       dockerfile: Dockerfile-nginx
     restart: always
+    hostname: nginx
+    networks:
+      - damafactory
     ports:
-     - ${APP_HTTP_PORT:-80}:80
-     - ${APP_HTTPS_PORT:-443}:443
+      - ${APP_HTTP_PORT:-80}:80
+      - ${APP_HTTPS_PORT:-443}:443
+    links:
+      - php
     environment:
       - TZ=${APP_TIMEZONE:-UTC}
     volumes:
       - ./:/damafactory/app
       - ./docker/config/nginx/nginx.conf:/etc/nginx/nginx.conf
-    networks:
-      - damafactory
 
   php:
     build:
       context: ./docker/dockerfiles
       dockerfile: Dockerfile-php
     restart: always
+    hostname: php
+    networks:
+      - damafactory
     environment:
       - TZ=${APP_TIMEZONE:-UTC}
     volumes:
       - ./:/damafactory/app
       - ./docker/config/php:/usr/local/etc/php
-    networks:
-      - damafactory
-
-networks:
-  damafactory:
-    driver: bridge
-    driver_opts:
-      com.docker.network.enable_ipv6: "false"
-    ipam:
-     config:
-      - subnet: ${DOCKER_SUBNET:-10.5.0.0/24}
